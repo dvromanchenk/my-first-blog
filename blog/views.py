@@ -1,9 +1,9 @@
 from django.core.checks import messages
 from django.shortcuts import render
 from django.utils import timezone
-from .models import Post
+from .models import Post, User
 from django.shortcuts import render, get_object_or_404
-from .forms import PostForm, LoginForm
+from .forms import PostForm, LoginForm, CreateUserForm
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate, login, logout
 
@@ -54,12 +54,9 @@ def login_view(request):
     if request.method == "POST":
         form = LoginForm(request.POST)
         if form.is_valid():
-            user = authenticate(username=request.POST['email'], password=request.POST['password'])
-            if user is not None:
-                if user.is_active:
-                    login(request, user)
-                    # Redirect to a success page.
-                    return redirect('post_list')
+            login(request, form.get_user())
+            # Redirect to a success page.
+            return redirect('post_list')
     else:
         form = LoginForm()
     return render(request, 'blog/login.html', {'form': form})
@@ -71,3 +68,23 @@ def logout_view(request):
     #return render(request, 'blog/login.html')
     return render(request, 'blog/login.html', {'form': form})
 
+
+def new_user_view(request):
+    if request.method == "POST":
+        form = CreateUserForm(request.POST)
+        if form.is_valid():
+            user = User.objects.create_user(
+                #form.cleaned_data['first_name'],
+                form.cleaned_data['email'],
+                form.cleaned_data['password'],
+                # form.cleaned_data['last_name'],
+                # form.cleaned_data['phone'],
+                # form.cleaned_data['skype'],
+                # form.cleaned_data['avatar'],
+            )
+            user.save()
+            # Redirect to a success page.
+            return redirect('post_list')
+    else:
+        form = CreateUserForm()
+    return render(request, 'blog/login.html', {'form': form})
