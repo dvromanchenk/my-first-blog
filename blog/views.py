@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.utils import timezone
 from .models import Post
 from django.shortcuts import render, get_object_or_404
-from .forms import PostForm
+from .forms import PostForm, LoginForm
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate, login, logout
 
@@ -51,27 +51,23 @@ def post_edit(request, pk):
 
 
 def login_view(request):
-        email = request.POST['email']
-        password = request.POST['password']
-        user = authenticate(username=email, password=password)
-        if user is not None:
-            if user.is_active:
-                login(request, user)
-                # Redirect to a success page.
-                posts = Post.objects.order_by('published_date')
-                return render(request, 'blog/post_list.html', {'posts': posts})
-            else:
-                messages.error(request, 'username or password not correct')
-                #return render(request, 'blog/login.html')
-                # Return a 'disabled account' error message
-        else:
-            return render(request, 'blog/login.html')
+    if request.method == "POST":
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            user = authenticate(username=request.POST['email'], password=request.POST['password'])
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                    # Redirect to a success page.
+                    return redirect('post_list')
+    else:
+        form = LoginForm()
+    return render(request, 'blog/login.html', {'form': form})
 
 
 def logout_view(request):
+    form = LoginForm()
     logout(request)
     #return render(request, 'blog/login.html')
-    return render(request, 'blog/login.html')
+    return render(request, 'blog/login.html', {'form': form})
 
-def goto_login(request):
-    return render(request, 'blog/login.html')
