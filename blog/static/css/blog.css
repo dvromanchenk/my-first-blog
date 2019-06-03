@@ -28,6 +28,13 @@ h1, h2, h3, h4 {
     float: right;
 }
 
+.detail {
+    float: left;
+    font-family: 'Lobster', cursive;
+    font-size: 18pt;
+    color: #000000;
+}
+
 .post-form textarea, .post-form input {
     width: 100%;
 }
@@ -49,9 +56,16 @@ h1, h2, h3, h4 {
 
 .button{
     float: right;
-     margin-right: 20px;
+    margin-right: 20px;
+    font-family: 'Lobster', cursive;
+    font-size: 16pt;
+    color: #000000;
 }
 
 .login-form textarea, .login-form input {
+    width: 100%;
+}
+
+.user_data-form textarea {
     width: 100%;
 }

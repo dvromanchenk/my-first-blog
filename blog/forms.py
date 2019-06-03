@@ -8,7 +8,14 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ('title', 'text', )
+        fields = ('title', 'short_text', 'text')
+
+
+class PostShortForm(forms.ModelForm):
+
+    class Meta:
+        model = Post
+        fields = ('title', 'short_text')
 
 
 class LoginForm(forms.ModelForm):
@@ -44,3 +51,10 @@ class CreateUserForm(forms.ModelForm):
             'password': forms.PasswordInput(),
         }
         fields = ('email', 'password', 'first_name', 'last_name', 'phone', 'skype', 'avatar')
+
+
+class PersonalUserForm(forms.ModelForm):
+
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'phone', 'skype', 'avatar')

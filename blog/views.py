@@ -1,9 +1,10 @@
-from django.core.checks import messages
+import pudb
+from django.contrib import messages
 from django.shortcuts import render
 from django.utils import timezone
 from .models import Post, User
 from django.shortcuts import render, get_object_or_404
-from .forms import PostForm, LoginForm, CreateUserForm
+from .forms import PostForm, LoginForm, CreateUserForm, PersonalUserForm
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate, login, logout
 
@@ -13,6 +14,9 @@ from django.contrib.auth import authenticate, login, logout
 
 def post_list(request):
     posts = Post.objects.order_by('published_date')
+    if posts is None:
+        messages.add_message(request, messages.INFO, 'No posts')
+
     return render(request, 'blog/post_list.html', {'posts': posts})
 
 
@@ -56,35 +60,45 @@ def login_view(request):
         if form.is_valid():
             login(request, form.get_user())
             # Redirect to a success page.
-            return redirect('post_list')
+            return redirect('personal_cabinet')
     else:
         form = LoginForm()
     return render(request, 'blog/login.html', {'form': form})
 
 
 def logout_view(request):
-    form = LoginForm()
     logout(request)
-    #return render(request, 'blog/login.html')
-    return render(request, 'blog/login.html', {'form': form})
+    return redirect('login')
 
 
 def new_user_view(request):
     if request.method == "POST":
         form = CreateUserForm(request.POST)
         if form.is_valid():
-            user = User.objects.create_user(
-                #form.cleaned_data['first_name'],
-                form.cleaned_data['email'],
-                form.cleaned_data['password'],
-                # form.cleaned_data['last_name'],
-                # form.cleaned_data['phone'],
-                # form.cleaned_data['skype'],
-                # form.cleaned_data['avatar'],
-            )
+            user = User.objects.create_user(**form.cleaned_data)
             user.save()
             # Redirect to a success page.
             return redirect('post_list')
     else:
         form = CreateUserForm()
     return render(request, 'blog/login.html', {'form': form})
+
+
+def personal_cabinet(request):
+    if request.method == "POST":
+        form = PersonalUserForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.add_message(request, messages.INFO, 'Data saved')
+    else:
+        form = PersonalUserForm(instance=request.user)
+    return render(request, 'blog/personal_cabinet.html', {'form': form})
+
+
+def my_posts(request):
+    posts = Post.objects.filter(author=request.user)
+    if posts is None:
+        messages.add_message(request, messages.INFO, 'No posts')
+
+    return render(request, 'blog/post_list.html', {'posts': posts})
+
