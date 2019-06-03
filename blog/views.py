@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.utils import timezone
 from .models import Post, User
 from django.shortcuts import render, get_object_or_404
-from .forms import PostForm, LoginForm, CreateUserForm, PersonalUserForm
+from .forms import PostForm, LoginForm, CreateUserForm, PersonalUserForm, CommentForm
 from django.shortcuts import redirect
 from django.contrib.auth import login, logout
 
@@ -11,7 +11,12 @@ from django.contrib.auth import login, logout
 
 
 def post_list(request):
-    posts = Post.objects.order_by('published_date')
+    sort = request.GET.get('sort')
+    if sort == 'author':
+        posts = Post.objects.order_by('author')
+    else:
+        posts = Post.objects.order_by('published_date')
+
     if posts is None:
         messages.add_message(request, messages.INFO, 'No posts')
 
@@ -100,3 +105,16 @@ def my_posts(request):
 
     return render(request, 'blog/post_list.html', {'posts': posts})
 
+
+def add_comment_to_post(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.save()
+            return redirect('post_detail', pk=post.pk)
+    else:
+        form = CommentForm()
+    return render(request, 'blog/add_comment_to_post.html', {'form': form})

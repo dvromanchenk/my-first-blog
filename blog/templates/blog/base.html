@@ -19,6 +19,10 @@
                 <span class="glyphicon glyphicon-log-out">
                 </span>
             </a>
+                        <a href="{% url 'personal_cabinet' %}" class="top-menu">
+                 <span class=" glyphicon glyphicon-user ">
+                 </span>
+            </a>
             {% else %}
             <a href="{% url 'login' %}" class="top-menu">
                 <span class="glyphicon glyphicon-log-in">
@@ -27,10 +31,6 @@
             <a href="{% url 'new_user' %}" class="top-menu">
                  <span class="glyphicon">
                      Register
-                 </span>
-            </a>
-            <a href="{% url 'personal_cabinet' %}" class="top-menu">
-                 <span class=" glyphicon glyphicon-user ">
                  </span>
             </a>
             {% endif %}

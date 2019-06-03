@@ -2,6 +2,10 @@
 
 {% block content %}
     <h1>Personal Cabinet</h1>
+    {% if user.avatar %}
+    <img src="{{ user.avatar }}" alt="user-avatar"
+         width="100px" height="100px">
+    {% endif %}
     {% if messages %}
     <ul class="messages">
         {% for message in messages %}

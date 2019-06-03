@@ -1,6 +1,9 @@
 {% extends 'blog/base.html' %}
 
 {% block content %}
+    <text>Sort: </text>
+    <a href="/?sort=author">author,</a>
+    <a href="/?sort=date">date</a>
     {% if messages %}
     <ul class="messages">
         {% for message in messages %}
@@ -15,6 +18,7 @@
             </div>
             <h1><a href="{% url 'post_detail' pk=post.pk %}">{{ post.title }}</a></h1>
             <p>{{ post.short_text|linebreaksbr }}</p>
+            <a href="{% url 'post_detail' pk=post.pk %}">Comments: {{ post.comments.count }}</a>
         </div>
     {% endfor %}
 {% endblock %}

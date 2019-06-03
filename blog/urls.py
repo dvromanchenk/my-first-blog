@@ -10,5 +10,6 @@ urlpatterns = [
     path('logout', views.logout_view, name='logout'),
     path('new_user', views.new_user_view, name='new_user'),
     path('personal_cabinet', views.personal_cabinet, name='personal_cabinet'),
-    path('my_posts', views.my_posts, name='my_posts')
+    path('my_posts', views.my_posts, name='my_posts'),
+    path('post/<int:pk>/comment/', views.add_comment_to_post, name='add_comment_to_post'),
 ]

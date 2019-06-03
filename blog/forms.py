@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth import authenticate
 
-from .models import Post, User
+from .models import Post, User, Comment
 
 
 class PostForm(forms.ModelForm):
@@ -58,3 +58,10 @@ class PersonalUserForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ('first_name', 'last_name', 'phone', 'skype', 'avatar')
+
+
+class CommentForm(forms.ModelForm):
+
+    class Meta:
+        model = Comment
+        fields = ('author', 'text',)
