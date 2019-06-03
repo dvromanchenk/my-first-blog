@@ -1,12 +1,10 @@
-import pudb
 from django.contrib import messages
-from django.shortcuts import render
 from django.utils import timezone
 from .models import Post, User
 from django.shortcuts import render, get_object_or_404
 from .forms import PostForm, LoginForm, CreateUserForm, PersonalUserForm
 from django.shortcuts import redirect
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login, logout
 
 
 # Create your views here.
