@@ -12,4 +12,5 @@ urlpatterns = [
     path('personal_cabinet', views.personal_cabinet, name='personal_cabinet'),
     path('my_posts', views.my_posts, name='my_posts'),
     path('post/<int:pk>/comment/', views.add_comment_to_post, name='add_comment_to_post'),
+    path('post/mark/<int:pk>', views.mark_to_post, name='mark_to_post'),
 ]

@@ -1,6 +1,9 @@
 from django.contrib import messages
+from django.http import HttpResponse
 from django.utils import timezone
-from .models import Post, User
+from django.views.generic import TemplateView
+
+from .models import Post, User, Rating
 from django.shortcuts import render, get_object_or_404
 from .forms import PostForm, LoginForm, CreateUserForm, PersonalUserForm, CommentForm
 from django.shortcuts import redirect
@@ -76,7 +79,7 @@ def logout_view(request):
 
 def new_user_view(request):
     if request.method == "POST":
-        form = CreateUserForm(request.POST)
+        form = CreateUserForm(request.POST, request.FILES)
         if form.is_valid():
             user = User.objects.create_user(**form.cleaned_data)
             user.save()
@@ -89,7 +92,7 @@ def new_user_view(request):
 
 def personal_cabinet(request):
     if request.method == "POST":
-        form = PersonalUserForm(request.POST, instance=request.user)
+        form = PersonalUserForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
             messages.add_message(request, messages.INFO, 'Data saved')
@@ -118,3 +121,20 @@ def add_comment_to_post(request, pk):
     else:
         form = CommentForm()
     return render(request, 'blog/add_comment_to_post.html', {'form': form})
+
+
+def mark_to_post(request, pk):
+    post = Post.objects.get(pk=pk)
+    rating, created = Rating.objects.get_or_create(post=post, author=request.user)
+
+    if created:
+        mark = int(request.GET.get('mark'))
+        rating.change_marks(mark=mark)
+        post.change_mark(mark=mark)
+
+        rating.save()
+        post.save()
+    else:
+        messages.add_message(request, messages.INFO, 'You already rate this post')
+    return redirect('post_detail', pk=pk)
+

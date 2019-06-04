@@ -1,6 +1,9 @@
 {% extends 'blog/base.html' %}
 
 {% block content %}
+    {% for message in messages %}
+        <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
     <div class="post">
         {% if post.published_date %}
         <div class="date">
@@ -8,14 +11,23 @@
         </div>
         {% endif %}
         {% if user.is_authenticated %}
-        <a href="{% url 'post_edit' pk=post.pk %}" class="button" >
-            <span class="glyphicon glyphicon-pencil">
-            </span>
-        </a>
+            <a href="{% url 'post_edit' pk=post.pk %}" class="button" >
+                <span class="glyphicon glyphicon-pencil">
+                </span>
+            </a>
         {% endif %}
         <h1>{{ post.title }}</h1>
         <p>{{ post.text|linebreaksbr }}</p>
     </div>
+    <a href="{% url 'mark_to_post' pk=post.pk %}?mark=1">
+        <span class="glyphicon glyphicon-plus">
+        </span>
+    </a>
+    <a>{{ post.mark }}</a>
+    <a href="{% url 'mark_to_post' pk=post.pk %}?mark=-1">
+        <span class="glyphicon glyphicon-minus">
+        </span>
+    </a>
     <hr>
      <a class="btn btn-default" href="{% url 'add_comment_to_post' pk=post.pk %}">
         Add comment</a>

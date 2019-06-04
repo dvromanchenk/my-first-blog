@@ -17,10 +17,16 @@ class Post(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
     published_date = models.DateTimeField(blank=True, null=True)
     short_text = models.CharField(max_length=400)
+    mark = models.IntegerField(default=0)
 
     def publish(self):
         self.published_date = timezone.now()
         self.save()
+
+    def change_mark(self, mark):
+        self.mark += mark
+        self.save()
+
 
     def __str__(self):
         return self.title
@@ -103,6 +109,7 @@ class Comment(models.Model):
     text = models.TextField()
     created_date = models.DateTimeField(default=timezone.now)
     approved_comment = models.BooleanField(default=False)
+    rate = models.IntegerField(default=0)
 
     def approve(self):
         self.approved_comment = True
@@ -110,3 +117,37 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.text
+
+    def count_rate(self):
+        marks = Rating.objects.filter(post=self)
+        value = 0
+        for mark in marks:
+            value += mark.value
+        self.rate = value
+
+
+class RatingManager(models.Manager):
+    def create_rating(self, author, post):
+        mark = self.create(author=author, post=post)
+        return mark
+
+
+class Rating(models.Model):
+    value = models.IntegerField(default=0)
+    post = models.ForeignKey('blog.Post', on_delete=models.CASCADE)
+    author = models.ForeignKey('blog.User', on_delete=models.CASCADE)
+
+    objects = RatingManager()
+
+    def change_marks(self, mark):
+        self.value = mark
+
+    def __str__(self):
+        return str(self.value)
+
+
+class Category(models.Model):
+    title = models.CharField(max_length=30)
+
+    def __str__(self):
+        return self.title
