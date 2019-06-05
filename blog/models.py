@@ -68,6 +68,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     skype = models.CharField(_('skype'), max_length=30, blank=True)
     is_active = models.BooleanField(_('active'), default=True)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+    activation_key = models.CharField(max_length=40, blank=True)
+    confirm = models.BooleanField(_('active'), default=True)
     is_staff = models.BooleanField(
         _('staff status'),
         default=False,

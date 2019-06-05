@@ -64,4 +64,8 @@ class CommentForm(forms.ModelForm):
 
     class Meta:
         model = Comment
-        fields = ('author', 'text',)
+        fields = ('author', 'text')
+
+
+class SearchForm(forms.Form):
+    search = forms.CharField(label='search', max_length=100)

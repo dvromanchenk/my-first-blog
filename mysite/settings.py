@@ -127,3 +127,14 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_ROOT = os.path.normpath(os.path.join(BASE_DIR, "../avatars"))
 
 MEDIA_URL = '/avatars/'
+
+# Email settings
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'dblogsupp@gmail.com'
+EMAIL_HOST_PASSWORD = 'Verter21025162'
+DEFAULT_FROM_EMAIL = 'admin'
+DEFAULT_TO_EMAIL = 'dblogsupp@gmail.com'
