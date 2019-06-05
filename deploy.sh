@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
-
-cd romanchenkodv.pythonanywhere.com 
+ 
 git pull origin dev
 source myvenv/bin/activate
 pip install -r requirements
