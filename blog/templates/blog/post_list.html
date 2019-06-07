@@ -2,13 +2,27 @@
 
 {% block content %}
     <text>Sort: </text>
-    <a href="/?sort=author">author,</a>
-    <a href="/?sort=date">date</a>
+    <a href="?sort=author">author,</a>
+    <a href="?sort=date">date</a>
     <form action='/' method="post">{% csrf_token %}
         <text for="search">Search:</text>
         <input id="search" type="text" name="search" value="{{ search }}">
         <input type="submit" value="ok">
     </form>
+    <div class="col-md-2 col-md-offset-1" >
+        <div >
+          <ul class="sidebar nav nav-pills nav-stacked">
+            <li class="nav-item {% if not category %} active {% endif %}" ><a class="nav-link"  href="/">All category</a></li>
+            {% for next_category in category_list %}
+              <li class="nav-item {% if category == next_category.id %}active{% endif %}">
+                  <a class="nav-link"  href="?category={{ next_category.pk }}">
+                      {{ next_category.title }}
+                  </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+    </div>
     {% for post in posts %}
         <div class="post">
             <div class="date">

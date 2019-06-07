@@ -11,6 +11,16 @@ from django.contrib.auth.base_user import BaseUserManager
 
 
 class Post(models.Model):
+
+    MODERATION = 'M'
+    CHECKED = 'C'
+    REJECTED = 'R'
+    STATUSES = (
+        (MODERATION, 'On moderation'),
+        (CHECKED, 'Checked'),
+        (REJECTED, 'Rejected')
+    )
+
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     text = models.TextField()
@@ -18,6 +28,9 @@ class Post(models.Model):
     published_date = models.DateTimeField(blank=True, null=True)
     short_text = models.CharField(max_length=400)
     mark = models.IntegerField(default=0)
+    category = models.ForeignKey('blog.Category', null=True, blank=True, on_delete=models.PROTECT)
+    status = models.CharField(choices=STATUSES, max_length=1, default=MODERATION)
+    reason = models.TextField(default="", blank=True)
 
     def publish(self):
         self.published_date = timezone.now()
@@ -27,6 +40,30 @@ class Post(models.Model):
         self.mark += mark
         self.save()
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.prev_status = self.status
+
+    def save(self, *args, **kwargs):
+
+        if self.status != self.prev_status:
+            email = self.author.email
+            name = self.author.first_name
+
+            if self.status == self.MODERATION:
+                self.published_date = timezone.now()
+                email_subject = 'Публикация поста'
+                email_body = "Здравствуйте, %s! Ваш пост \"%s\" опубликован." % (name, self.title)
+                send_mail(email_subject, email_body, settings.EMAIL_HOST_USER, [email], fail_silently=False)
+
+            elif self.status == self.REJECTED:
+                email_subject = 'Пост не опубликован'
+                email_body = "Здравствуйте, %s! Публикация Вашего поста \"%s\" отклонена модератором." \
+                             "\nПричина: %s." % (name, self.title, self.reason)
+                send_mail(email_subject, email_body, settings.EMAIL_HOST_USER, [email], fail_silently=False)
+
+        return super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title

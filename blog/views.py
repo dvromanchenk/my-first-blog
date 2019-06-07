@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.views.generic import TemplateView
 
 from mysite import settings
-from .models import Post, User, Rating
+from .models import Post, User, Rating, Category
 from django.shortcuts import render, get_object_or_404
 from .forms import PostForm, LoginForm, CreateUserForm, PersonalUserForm, CommentForm, SearchForm
 from django.shortcuts import redirect
@@ -20,22 +20,39 @@ from django.contrib.auth import login, logout
 def post_list(request):
     sort = request.GET.get('sort')
     search = request.POST.get('search')
+    category = request.GET.get('category')
+    category_list = Category.objects.order_by('title')
+    posts = Post.objects.all()
     if search is not None and request.method == "POST":
-        posts = Post.objects.filter(Q(title__icontains=search) |
-                                    Q(short_text__icontains=search) |
-                                    Q(text__icontains=search))
+        posts = posts.filter(Q(title__icontains=search) |
+                             Q(short_text__icontains=search) |
+                             Q(text__icontains=search))
     else:
-        posts = Post.objects.order_by('published_date')
+        posts = posts.order_by('published_date')
 
     if sort == 'author':
-        posts = Post.objects.order_by('author')
+        posts = posts.order_by('author')
     elif sort == 'date':
-        posts = Post.objects.order_by('published_date')
+        posts = posts.order_by('published_date')
+
+    if category:
+        posts = posts.filter(category=category)
 
     if posts is None:
         messages.add_message(request, messages.INFO, 'No posts')
+    else:
+        posts = posts.filter(status=Post.CHECKED)
 
-    return render(request, 'blog/post_list.html', {'posts': posts, 'search': search})
+    return render(
+        request,
+        'blog/post_list.html',
+        {
+            'posts': posts,
+            'search': search,
+            'category_list': category_list,
+            'category': int(category) if category else None
+        }
+    )
 
 
 def post_detail(request, pk):
