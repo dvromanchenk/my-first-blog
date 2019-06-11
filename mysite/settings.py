@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'blog',
+    'chat',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -138,3 +140,19 @@ EMAIL_HOST_USER = 'dblogsupp@gmail.com'
 EMAIL_HOST_PASSWORD = 'Verter21025162'
 DEFAULT_FROM_EMAIL = 'admin'
 DEFAULT_TO_EMAIL = 'dblogsupp@gmail.com'
+
+#Django channels chat settings
+
+ASGI_APPLICATION = 'mysite.routing.application'
+
+#Channel layer definitions
+
+ASGI_APPLICATION = 'mysite.routing.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
