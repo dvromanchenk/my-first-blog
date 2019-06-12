@@ -7,7 +7,8 @@ from django.utils import timezone
 from mysite import settings
 from .models import Post, User, Rating, Category
 from django.shortcuts import render, get_object_or_404
-from .forms import PostForm, LoginForm, CreateUserForm, PersonalUserForm, CommentForm, SearchForm
+from .forms import PostForm, LoginForm, CreateUserForm, PersonalUserForm, \
+    CommentForm, SearchForm, UserInfoForm
 from django.shortcuts import redirect
 from django.contrib.auth import login, logout
 
@@ -141,15 +142,20 @@ def personal_cabinet(request):
             messages.add_message(request, messages.INFO, 'Data saved')
     else:
         form = PersonalUserForm(instance=request.user)
-    return render(request, 'blog/personal_cabinet.html', {'form': form})
+
+    posts = my_posts(request)
+    return render(request, 'blog/personal_cabinet.html', {'form': form,
+                                                          'posts': posts,
+                                                          'author_flag': True
+                                                          })
 
 
-def my_posts(request):
-    posts = Post.objects.filter(author=request.user)
+def my_posts(request, pk=None):
+    posts = Post.objects.filter(author=request.user if not pk else User.objects.get(pk=pk))
     if posts is None:
         messages.add_message(request, messages.INFO, 'No posts')
 
-    return render(request, 'blog/post_list.html', {'posts': posts})
+    return posts
 
 
 def add_comment_to_post(request, pk):
@@ -198,3 +204,25 @@ def confirm_account(request, key):
         return redirect('personal_cabinet')
     else:
         return redirect('login')
+
+
+def post_delete(request, pk):
+    Post.objects.get(pk=pk).delete()
+    return redirect('post_list')
+
+
+def user_list(request):
+    users = User.objects.all()
+    return render(request, 'blog/user_list.html', {'users': users})
+
+
+def user_detail(request, pk):
+    user = User.objects.get(pk=pk)
+    form = UserInfoForm(instance=user)
+    posts = my_posts(request, pk=pk)
+    return render(request, 'blog/personal_cabinet.html', {'form': form,
+                                                          'posts': posts,
+                                                          'user': user,
+                                                          'author_flag': True,
+                                                          'info_flag': True
+                                                          })

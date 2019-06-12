@@ -54,10 +54,22 @@ class CreateUserForm(forms.ModelForm):
 
 
 class PersonalUserForm(forms.ModelForm):
+    email = forms.EmailField(disabled=True)
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'phone', 'skype', 'avatar')
+        fields = ('email', 'first_name', 'last_name', 'phone', 'skype', 'avatar')
+
+
+class UserInfoForm(forms.ModelForm):
+    email = forms.EmailField(disabled=True)
+    first_name = forms.CharField(disabled=True)
+    last_name = forms.CharField(disabled=True)
+    phone = forms.CharField(disabled=True)
+    skype = forms.CharField(disabled=True)
+    class Meta:
+        model = User
+        fields = ('email', 'first_name', 'last_name', 'phone', 'skype')
 
 
 class CommentForm(forms.ModelForm):

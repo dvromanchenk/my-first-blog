@@ -14,4 +14,7 @@ urlpatterns = [
     path('post/<int:pk>/comment/', views.add_comment_to_post, name='add_comment_to_post'),
     path('post/mark/<int:pk>', views.mark_to_post, name='mark_to_post'),
     path('register/confirm/<str:key>/', views.confirm_account, name='confirm_account'),
+    path('post/<int:pk>/delete/', views.post_delete, name='post_delete'),
+    path('user_list', views.user_list, name='user_list'),
+    path('user_list/<int:pk>', views.user_detail, name='user_detail'),
 ]
