@@ -31,6 +31,10 @@
             <h1><a href="{% url 'post_detail' pk=post.pk %}">{{ post.title }}</a></h1>
             <p>{{ post.short_text|linebreaksbr }}</p>
             <a href="{% url 'post_detail' pk=post.pk %}">Comments: {{ post.comments.count }}</a>
+            <a href="?category={{ post.category.pk }}" style="float: right;">
+                Category:
+                {{ post.category }}
+            </a>
         </div>
     {% empty %}
         <p>No posts here yet :(</p>

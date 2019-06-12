@@ -1,5 +1,13 @@
+import datetime
+
+import pudb
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
+
+from django.utils import timezone
+
+from chat.models import Chat, ChatMessage
+
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -24,8 +32,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # Receive message from WebSocket
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-
+        message = (f'{self.scope["user"].first_name} '
+                   f'{self.scope["user"].first_name} '
+                   f'{timezone.now().strftime("%Y.%m.%d %H:%M:%S")} '
+                   f'{text_data_json["message"]}')
         # Send message to room group
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -34,6 +44,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'message': message
             }
         )
+        # add message to db
+        chat = Chat.objects.get(
+            theme=self.scope['url_route']['kwargs']['room_name'])
+        ChatMessage.objects.create(message=message, chat=chat)
 
     # Receive message from room group
     async def chat_message(self, event):

@@ -1,0 +1,8 @@
+    <text>Chat list:</text>
+{% for chat in chat_list %}
+    <div class="post">
+        <h1><a href="{% url 'room' room_name=chat.theme %}">{{ chat.theme }}</a></h1>
+    </div>
+{% empty %}
+    <p>No chats here yet :(</p>
+{% endfor %}
