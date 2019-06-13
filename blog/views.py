@@ -37,9 +37,7 @@ def post_list(request):
     if category:
         posts = posts.filter(category=category)
 
-    if posts is None:
-        messages.add_message(request, messages.INFO, 'No posts')
-    else:
+    if posts:
         posts = posts.filter(status=Post.CHECKED)
 
     return render(
@@ -78,10 +76,7 @@ def post_edit(request, pk):
     if request.method == "POST":
         form = PostForm(request.POST, instance=post)
         if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.published_date = timezone.now()
-            post.save()
+            post = form.save()
             return redirect('post_detail', pk=post.pk)
     else:
         form = PostForm(instance=post)
@@ -110,7 +105,6 @@ def new_user_view(request):
         form = CreateUserForm(request.POST, request.FILES)
         if form.is_valid():
             user = User.objects.create_user(**form.cleaned_data)
-            user.confirm = False
             email = form.cleaned_data['email'].lower()
             user.activation_key = hashlib.sha1(email.encode('utf-8')).hexdigest()
             user.save()
@@ -143,19 +137,11 @@ def personal_cabinet(request):
     else:
         form = PersonalUserForm(instance=request.user)
 
-    posts = my_posts(request)
+    posts = Post.objects.filter(author=request.user)
     return render(request, 'blog/personal_cabinet.html', {'form': form,
                                                           'posts': posts,
                                                           'author_flag': True
                                                           })
-
-
-def my_posts(request, pk=None):
-    posts = Post.objects.filter(author=request.user if not pk else User.objects.get(pk=pk))
-    if posts is None:
-        messages.add_message(request, messages.INFO, 'No posts')
-
-    return posts
 
 
 def add_comment_to_post(request, pk):
@@ -186,7 +172,6 @@ def mark_to_post(request, pk):
         post.change_mark(mark=mark)
 
         rating.save()
-        post.save()
     else:
         messages.add_message(request, messages.INFO, 'You already rate this post')
     return redirect('post_detail', pk=pk)
@@ -207,7 +192,7 @@ def confirm_account(request, key):
 
 
 def post_delete(request, pk):
-    Post.objects.get(pk=pk).delete()
+    Post.objects.get_or_404(pk=pk).delete()
     return redirect('post_list')
 
 
@@ -219,7 +204,7 @@ def user_list(request):
 def user_detail(request, pk):
     user = User.objects.get(pk=pk)
     form = UserInfoForm(instance=user)
-    posts = my_posts(request, pk=pk)
+    posts = Post.objects.filter(author=user)
     return render(request, 'blog/personal_cabinet.html', {'form': form,
                                                           'posts': posts,
                                                           'user': user,

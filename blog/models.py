@@ -30,7 +30,7 @@ class Post(models.Model):
     mark = models.IntegerField(default=0)
     category = models.ForeignKey('blog.Category', null=True, blank=True, on_delete=models.PROTECT)
     status = models.CharField(choices=STATUSES, max_length=1, default=MODERATION)
-    reason = models.TextField(default="", blank=True)
+    reason = models.TextField(blank=True)
 
     def publish(self):
         self.published_date = timezone.now()
@@ -51,7 +51,7 @@ class Post(models.Model):
             email = self.author.email
             name = self.author.first_name
 
-            if self.status == self.MODERATION:
+            if self.status == self.CHECKED:
                 self.published_date = timezone.now()
                 email_subject = 'Публикация поста'
                 email_body = "Здравствуйте, %s! Ваш пост \"%s\" опубликован." % (name, self.title)
@@ -106,7 +106,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(_('active'), default=True)
     avatar = models.ImageField(upload_to='avatars', null=True, blank=True)
     activation_key = models.CharField(max_length=40, blank=True)
-    confirm = models.BooleanField(_('active'), default=True)
+    confirm = models.BooleanField(_('active'), default=False)
     is_staff = models.BooleanField(
         _('staff status'),
         default=False,
@@ -116,29 +116,28 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
 
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
 
     def get_full_name(self):
-        '''
+        """
         Returns the first_name plus the last_name, with a space in between.
-        '''
+        """
         full_name = '%s %s' % (self.first_name, self.last_name)
         return full_name.strip()
 
     def get_short_name(self):
-        '''
+        """
         Returns the short name for the user.
-        '''
+        """
         return self.first_name
 
     def email_user(self, subject, message, from_email=None, **kwargs):
-        '''
+        """
         Sends an email to this User.
-        '''
+        """
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
 
@@ -165,18 +164,10 @@ class Comment(models.Model):
         self.rate = value
 
 
-class RatingManager(models.Manager):
-    def create_rating(self, author, post):
-        mark = self.create(author=author, post=post)
-        return mark
-
-
 class Rating(models.Model):
     value = models.IntegerField(default=0)
     post = models.ForeignKey('blog.Post', on_delete=models.CASCADE)
     author = models.ForeignKey('blog.User', on_delete=models.CASCADE)
-
-    objects = RatingManager()
 
     def change_marks(self, mark):
         self.value = mark
