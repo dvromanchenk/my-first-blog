@@ -9,7 +9,6 @@
         <input id="search" type="text" name="search" value="{{ search }}">
         <input type="submit" value="ok">
     </form>
-    <div class="col-md-2 col-md-offset-1" >
         <div >
           <ul class="sidebar nav nav-pills nav-stacked">
             <li class="nav-item {% if not category %} active {% endif %}" ><a class="nav-link"  href="/">All category</a></li>
@@ -22,6 +21,6 @@
             {% endfor %}
           </ul>
         </div>
-    </div>
+    <hr>
     {% include 'blog/list_include.html' %}
 {% endblock %}
